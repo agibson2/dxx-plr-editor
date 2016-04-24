@@ -7,9 +7,17 @@ namespace dxxplreditor
 	{
 		public static void Main (string[] args)
 		{
-			string filename = "Z:/Games/Descent2/static.plr";
+			const string default_filename = "Z:/Games/Descent2/static.plr";
 
-			PlrClass plr = new PlrClass("STATIC.PLR");
+			string filename;
+
+			if (args.Length > 0) {
+				filename = args [1];
+			} else {
+				filename = default_filename;
+			}
+
+			PlrClass plr = new PlrClass();
 			plr.ImportFromFile( filename );
 			plr.Dump ();
 			Console.ReadKey ();
