@@ -11,15 +11,18 @@ namespace dxxplreditor
 
 			string filename;
 
+			Console.WriteLine ("args length =" + args.Length);
+
 			if (args.Length > 0) {
-				filename = args [1];
+				filename = args [0];
 			} else {
 				filename = default_filename;
 			}
 
 			PlrClass plr = new PlrClass();
-			plr.ImportFromFile( filename );
+			plr.ImportFromFile (filename);
 			plr.Dump ();
+			plr.ExportToFile (filename);
 			Console.ReadKey ();
 		}
 	}

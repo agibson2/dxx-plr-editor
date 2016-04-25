@@ -1,6 +1,26 @@
-﻿using System;
+﻿/*
+ *  Program to import and export Descent 1 and Descent 2 PLR files
+ *    This program will eventually be able to change details of the PLR file
+ *    from the command line for instance changing descent macros and allowing
+ *    color in them easily using command line switches.  You can have a batch
+ *    file that sets F9 through F12 macros depending on what you plan to do.
+ *    You can have competition macros or just fun macros when you launch your
+ *    descent games.
+ * 
+ *    StatiC
+ * 
+ *   agibson2
+ *      @
+ *    gmail
+ *      .
+ *     com
+ */
+
+
+using System;
 using System.IO;
 using System.Text;
+using System.Collections.Generic;
 
 namespace dxxplreditor
 {
@@ -19,6 +39,7 @@ namespace dxxplreditor
 		// non PLR file info
 		public int descentversion = -1;
 		bool isbigendianfile = false;
+		int imported_filesize = 0;
 		// end non PLR file info
 
 		public Int32 signature;
@@ -120,15 +141,15 @@ namespace dxxplreditor
 			signature = newSignature;
 		}
 
-		public int SetResolution( Int16 newResolution )
-		{
-			if((newResolution >= 0) || (newResolution <= 4)) {
-				resolution = newResolution;
-				return 1;
-			} else {
-				return 0;
-			}
-		}
+		//public int SetResolution( Int16 newResolution )
+		//{
+		//	if((newResolution >= 0) || (newResolution <= 4)) {
+		//		resolution = newResolution;
+		//		return 1;
+		//	} else {
+		//		return 0;
+		//	}
+		//}
 
 		public void SetGame_window_w( UInt16 newGame_window_w )
 		{
@@ -295,9 +316,9 @@ namespace dxxplreditor
 			if (descentversion == 1) {
 				Console.WriteLine (" struct_version(1): " + struct_version);
 			}
-			if (descentversion == 2) {
-				Console.WriteLine (" resolution(2): " + resolution);
-			}
+			//if (descentversion == 2) {
+			//	Console.WriteLine (" resolution(2): " + resolution);
+			//}
 			if (descentversion == 2) {
 				Console.WriteLine (" game_window_h(2): " + game_window_h);   //+ BitConverter.ToString (unknown1));
 				Console.WriteLine (" game_window_w(2): " + game_window_w);
@@ -333,16 +354,27 @@ namespace dxxplreditor
 				Console.WriteLine (" controller_type(1): " + controller_type);
 			}
 			if (descentversion == 2) {
-				Console.WriteLine (" obsolete_winjoy_map(2): " + obsolete_winjoy_map);
+				if (savegame_version <= 20) {
+					Console.WriteLine (" obsolete_winjoy_map(2): " + obsolete_winjoy_map);
+				}
 				Console.WriteLine (" control_type_dos(2): " + control_type_dos);
 				Console.WriteLine (" control_type_win(2): " + control_type_win);
+			}
 
+			Console.WriteLine (" obsolete_joy_sens(2): " + obsolete_joy_sens);
+
+			if (descentversion == 2) {
 				tmploop = 0;
 				Console.WriteLine (" weapons_order_arr(2):");
 				while (tmploop < PLR_MAX_WEAPON_ORDER_ENTRIES) {
 					Console.WriteLine ("  {0}:{1}", weapons_order_arr [tmploop].primaryOrder, weapons_order_arr [tmploop].secondaryOrder);
 					++tmploop;
 				}
+				if (savegame_version >= 16) {
+					Console.WriteLine (" cockpit_3dview1: ", cockpit_3dview1);
+					Console.WriteLine (" cockpit_3dview2: ", cockpit_3dview2);
+				}
+
 				Console.WriteLine (" lifetimerankings_num_kills(2): " + lifetimerankings_num_kills);
 				Console.WriteLine (" lifetimerankings_num_deaths(2): " + lifetimerankings_num_deaths);
 				Console.WriteLine (" lifetimerankings_checksum(2): " + lifetimerankings_checksum);
@@ -356,10 +388,12 @@ namespace dxxplreditor
 		public int ImportFromFile( string filename )
 		{
 			int fileoffset = 0;
-			byte[] filedata = File.ReadAllBytes(filename);
-			string filenameonly = Path.GetFileNameWithoutExtension(filename);
 			import_valid = false;
 			descentversion = -1;
+			Encoding encBinary = Encoding.GetEncoding (28591);
+
+			byte[] filedata = File.ReadAllBytes(filename);
+			string filenameonly = Path.GetFileNameWithoutExtension(filename);
 			SetName (filenameonly);
 
 			SetSignature( BitConverter.ToInt32(filedata, fileoffset) );  //0
@@ -463,7 +497,7 @@ namespace dxxplreditor
 			while (loop < num_mission_protocol_entries) {
 				PlrMission thisMiss = new PlrMission ();
 				//int startoffset = loop * MISSION_PROTOCOL_ENTRY_LENGTH + fileoffset;
-				thisMiss.mission_name = Encoding.ASCII.GetString (filedata, fileoffset, 8);
+				thisMiss.mission_name = encBinary.GetString (filedata, fileoffset, PLR_MISSION_MAXLEVEL_NAME_LENGTH);
 				fileoffset += PLR_MISSION_MAXLEVEL_NAME_LENGTH;
 				thisMiss.maximum_level = filedata [fileoffset++];
 				mission_arr [loop] = thisMiss;
@@ -481,13 +515,13 @@ namespace dxxplreditor
 			const int MULTIPLAYER_MACRO_BUFFER_SIZE = 35;
 
 			//int offset = PLR_MISSION_PROTOCOL_ENTRIES_OFFSET + (num_mission_protocol_entries * 10);
-			multiplayer_macro_f9 = Encoding.ASCII.GetString (filedata, fileoffset, MULTIPLAYER_MACRO_BUFFER_SIZE);
+			multiplayer_macro_f9 = encBinary.GetString (filedata, fileoffset, MULTIPLAYER_MACRO_BUFFER_SIZE);
 			fileoffset += MULTIPLAYER_MACRO_BUFFER_SIZE;
-			multiplayer_macro_f10 = Encoding.ASCII.GetString (filedata, fileoffset, MULTIPLAYER_MACRO_BUFFER_SIZE);
+			multiplayer_macro_f10 = encBinary.GetString (filedata, fileoffset, MULTIPLAYER_MACRO_BUFFER_SIZE);
 			fileoffset += MULTIPLAYER_MACRO_BUFFER_SIZE;
-			multiplayer_macro_f11 = Encoding.ASCII.GetString (filedata, fileoffset, MULTIPLAYER_MACRO_BUFFER_SIZE);
+			multiplayer_macro_f11 = encBinary.GetString (filedata, fileoffset, MULTIPLAYER_MACRO_BUFFER_SIZE);
 			fileoffset += MULTIPLAYER_MACRO_BUFFER_SIZE;
-			multiplayer_macro_f12 = Encoding.ASCII.GetString (filedata, fileoffset, MULTIPLAYER_MACRO_BUFFER_SIZE);
+			multiplayer_macro_f12 = encBinary.GetString (filedata, fileoffset, MULTIPLAYER_MACRO_BUFFER_SIZE);
 			fileoffset += MULTIPLAYER_MACRO_BUFFER_SIZE;
 
 			const int PLR_CONTROL_MAX_TYPES_D1 = 7;
@@ -498,7 +532,8 @@ namespace dxxplreditor
 				int configurationlength = PLR_MAX_CONTROLS_D1 * PLR_CONTROL_MAX_TYPES_D1;
 				Array.Copy (filedata, fileoffset, configuration, 0, configurationlength);
 				fileoffset += configurationlength;
-			} else {
+			}
+			if (descentversion == 2) {
 				int configurationlength = (savegame_version < 20 ? PLR_MAX_CONTROLS_D1 : PLR_MAX_CONTROLS_D2) * PLR_CONTROL_MAX_TYPES_D2;
 				Array.Copy (filedata, fileoffset, configuration, 0, configurationlength);
 				fileoffset += configurationlength;
@@ -506,7 +541,8 @@ namespace dxxplreditor
 
 			if (descentversion == 1) {
 				SetController_type (filedata [fileoffset++]);
-			} else {
+			}
+			if (descentversion == 2) {
 				if (savegame_version <= 20) {
 					SetObsolete_winjoy_map (filedata [fileoffset++]);
 				}
@@ -543,12 +579,12 @@ namespace dxxplreditor
 
 				const int PLR_GUIDEBOT_MAX_LEN = 10;
 				if (savegame_version >= 18) {
-					guidebot_callsign = Encoding.ASCII.GetString (filedata, fileoffset, PLR_GUIDEBOT_MAX_LEN);
+					guidebot_callsign = encBinary.GetString (filedata, fileoffset, PLR_GUIDEBOT_MAX_LEN);
 					fileoffset += PLR_GUIDEBOT_MAX_LEN;
 				}
 
 				if (savegame_version >= 24) {
-					joystick_name = Encoding.ASCII.GetString (filedata, fileoffset, PLR_MAX_JOYSTICK_NAME_BUFFER);
+					joystick_name = encBinary.GetString (filedata, fileoffset, PLR_MAX_JOYSTICK_NAME_BUFFER);
 					fileoffset += PLR_MAX_JOYSTICK_NAME_BUFFER;
 				}
 			}
@@ -558,16 +594,118 @@ namespace dxxplreditor
 				return (-1);
 			}
 
+			imported_filesize = filedata.Length;
 			import_valid = true;
 			return (0);
 		}
 
-		public void ExportToFile()
+		public int ExportToFile (string filename)
 		{
-			//byte[] filedata;
-			//int index = 0;
+			if (!import_valid) {
+				Console.WriteLine ("PLR import was not loaded successfully first.  Can't export an incomplete PLR file.");
+				return (-1);
+			}
+				
+			int filedata_index = 0;
+			Encoding encBinary = Encoding.GetEncoding (28591);
 
-			//filedata[index++] = 
+			List<byte[]> filedata_l = new List<byte[]>();
+
+			filedata_l.Add (BitConverter.GetBytes (signature));
+			filedata_l.Add (BitConverter.GetBytes (savegame_version));
+			if(descentversion == 1) {
+				filedata_l.Add (BitConverter.GetBytes (struct_version));
+				filedata_l.Add (BitConverter.GetBytes (num_mission_protocol_entries));
+			}
+			if (descentversion == 2) {
+				filedata_l.Add (BitConverter.GetBytes (game_window_h));
+				filedata_l.Add (BitConverter.GetBytes (game_window_w));
+			}
+			if (descentversion == 1) {
+				filedata_l.Add (BitConverter.GetBytes (default_difficulty));
+				filedata_l.Add (BitConverter.GetBytes (auto_leveling));
+			}
+			if (descentversion == 2) { // d2
+				filedata_l.AddByte ((byte) default_difficulty);  //byte for d2
+				filedata_l.AddByte ((byte) auto_leveling);  // byte for d2
+				filedata_l.AddByte (show_reticle);
+				filedata_l.AddByte (cockpit_mode);
+				filedata_l.AddByte (video_resolution);
+				filedata_l.AddByte (missile_view);
+				filedata_l.AddByte (headlight_on_when_picked_up);
+				filedata_l.AddByte (show_guided_missile_in_main_display);
+				filedata_l.AddByte (automap_always_hires);
+				filedata_l.Add (BitConverter.GetBytes ((Int16) num_mission_protocol_entries));
+			}
+			foreach (PlrMission tmpMission in mission_arr) {
+				filedata_l.Add (encBinary.GetBytes(tmpMission.mission_name));
+				//Console.WriteLine ("'{0}':{1} {2}", tmpMission.mission_name, tmpMission.mission_name.Length, tmpMission.maximum_level);
+				filedata_l.AddByte (tmpMission.maximum_level);
+			}
+			filedata_l.Add (encBinary.GetBytes (multiplayer_macro_f9));
+			filedata_l.Add (encBinary.GetBytes (multiplayer_macro_f10));
+			filedata_l.Add (encBinary.GetBytes (multiplayer_macro_f11));
+			filedata_l.Add (encBinary.GetBytes (multiplayer_macro_f12));
+			filedata_l.Add (configuration);
+			if (descentversion == 1) {
+				filedata_l.AddByte (controller_type);
+			}
+			if (descentversion == 2) {
+				if (savegame_version <= 20) {
+					filedata_l.AddByte (obsolete_winjoy_map);
+				}
+				filedata_l.AddByte (control_type_dos);
+				filedata_l.AddByte (control_type_win);
+			}
+			filedata_l.AddByte (obsolete_joy_sens);
+			if (descentversion == 2) {
+				foreach (PlrWeaponOrder tmpWeaponOrder in weapons_order_arr) {
+					filedata_l.AddByte (tmpWeaponOrder.primaryOrder);
+					filedata_l.AddByte (tmpWeaponOrder.secondaryOrder);
+					//Console.WriteLine ("{0}:{1}", tmpWeaponOrder.primaryOrder, tmpWeaponOrder.secondaryOrder);
+				}
+				if (savegame_version >= 16) {
+					filedata_l.Add (BitConverter.GetBytes(cockpit_3dview1));
+					filedata_l.Add (BitConverter.GetBytes (cockpit_3dview2));
+				}
+				filedata_l.Add (BitConverter.GetBytes (lifetimerankings_num_kills));
+				filedata_l.Add (BitConverter.GetBytes (lifetimerankings_num_deaths));
+				filedata_l.Add (BitConverter.GetBytes (lifetimerankings_checksum));
+				filedata_l.Add (encBinary.GetBytes(guidebot_callsign));
+				filedata_l.Add (encBinary.GetBytes(joystick_name));
+			}
+
+			// Now lets write the data to a new array, then another array the correct size...
+			//  and then finally to a file.
+			//  TODO: figure out how to get the total bytes of the List<[]> filedata_l so that
+			//        we don't have to copy it twice!
+			byte[] filedata_arr = new byte[10000];
+
+			foreach (byte[] filedata_buffer in filedata_l) {
+				filedata_buffer.CopyTo (filedata_arr, filedata_index);
+				filedata_index += filedata_buffer.Length;
+			}
+
+			byte[] filedata_arr_truncated = new byte[filedata_index];
+
+			Array.Copy (filedata_arr, filedata_arr_truncated, filedata_index);
+
+			if (imported_filesize != filedata_arr_truncated.Length) {
+				Console.WriteLine ("WARNING: imported filesize was {0}.  Exported filesize is {1}.", imported_filesize, filedata_arr_truncated.Length);
+			}
+
+			File.WriteAllBytes (filename + ".new", filedata_arr_truncated);
+			Console.WriteLine ("Wrote new PLR file to {0}.new", filename);
+
+			//fileStream = new FileStream (fileName + ".new", FileMode.Create);
+			//FileStream.
+
+			if (descentversion != 2) {
+				Console.WriteLine ("WARNING: Exporting of PLR file is not completed for descent 1 yet");
+				return (-1);
+			}
+
+			return(0);
 		}
 	}
 }
