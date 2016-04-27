@@ -45,8 +45,8 @@ namespace dxxplreditor
 		public Int32 signature;
 
 		// d1
-		public Int16 savegame_version;  // saved_game_version in d1 and player_file_version in d2
-		public Int16 struct_version;  // d1 only
+		public UInt16 savegame_version;  // saved_game_version in d1 and player_file_version in d2
+		public UInt16 struct_version;  // d1 only
 
 		public Int16 resolution;
 		//public byte[] unknown1 = {0, 1, 2};
@@ -80,7 +80,7 @@ namespace dxxplreditor
 
 
 		const int PLR_CONFIGURATION_LENGTH = 480;
-		public byte[] configuration = new byte[PLR_CONFIGURATION_LENGTH];  //480
+		public byte[] configuration;  //480 but smaller for d1
 
 		// d1
 		public byte controller_type;  //type of controller (0-7)
@@ -121,12 +121,12 @@ namespace dxxplreditor
 			name = nm;
 		}
 
-		public void SetSavegame_version( Int16 newSavegame_version )
+		public void SetSavegame_version( UInt16 newSavegame_version )
 		{
 			savegame_version = newSavegame_version;
 		}
 
-		public void SetStruct_version( Int16 newStruct_version )
+		public void SetStruct_version( UInt16 newStruct_version )
 		{
 			struct_version = newStruct_version;
 		}
@@ -342,6 +342,11 @@ namespace dxxplreditor
 				Console.WriteLine ("  {0}:{1}", mission_arr[tmploop].mission_name, mission_arr[tmploop].maximum_level);
 				tmploop = tmploop + 1;
 			}
+			if(descentversion == 1) {
+				if (savegame_version != 7) {
+					Console.WriteLine (" save_game_data_shareware: {0} bytes of data", saved_game_data_shareware.Length );
+				}
+			}
 
 			Console.WriteLine (" multiplayer_macro_f9(1,2): " + multiplayer_macro_f9);
 			Console.WriteLine (" multiplayer_macro_f10(1,2): " + multiplayer_macro_f10);
@@ -404,7 +409,7 @@ namespace dxxplreditor
 				return (-1);
 			}
 				
-			SetSavegame_version( BitConverter.ToInt16(filedata, fileoffset) );
+			SetSavegame_version( BitConverter.ToUInt16(filedata, fileoffset) );
 			fileoffset += 2;  // now at 8
 
 			if ((savegame_version >= 0) && (savegame_version <= 8)) {
@@ -417,7 +422,7 @@ namespace dxxplreditor
 			const int PLR_COMPATIBLE_STRUCT_VERSION = 16;
 
 			if (descentversion == 1) {
-				SetStruct_version (BitConverter.ToInt16 (filedata, fileoffset));
+				SetStruct_version (BitConverter.ToUInt16 (filedata, fileoffset));
 				fileoffset += 2;
 				if (savegame_version < PLR_COMATIBLE_SAVEGAME_VERSION || struct_version < PLR_COMPATIBLE_STRUCT_VERSION) {
 					Console.WriteLine ("ERROR: savegame version {0} < {1} or PLR struct version {2} < {3}.  Can't load PLR file.", savegame_version, PLR_COMATIBLE_SAVEGAME_VERSION, struct_version, PLR_COMPATIBLE_STRUCT_VERSION);
@@ -430,6 +435,11 @@ namespace dxxplreditor
 				fileoffset += 4;
 				SetAuto_leveling (BitConverter.ToInt32(filedata, fileoffset));
 				fileoffset += 4;
+
+				if (savegame_version <= 5) {
+					Console.WriteLine ("ERROR: savegame_version <=5.  Old style highest level info not supported.");
+					return(-1);
+				}
 			}
 
 			const int PLR_MISSION_MAXLEVEL_NAME_LENGTH = 9;
@@ -463,7 +473,7 @@ namespace dxxplreditor
 			} else if (savegame_version > 255) {
 				isbigendianfile = true;
 				descentversion = 2;
-				savegame_version = System.Net.IPAddress.NetworkToHostOrder (savegame_version);
+				savegame_version = (UInt16)System.Net.IPAddress.NetworkToHostOrder ((int)savegame_version);
 				Console.WriteLine ("ERROR: PLR file looks like it is bigendian.  That architecture is not supported.");
 				return (-1);
 			}
@@ -530,6 +540,7 @@ namespace dxxplreditor
 			const int PLR_MAX_CONTROLS_D2 = 60;
 			if (descentversion == 1) {
 				int configurationlength = PLR_MAX_CONTROLS_D1 * PLR_CONTROL_MAX_TYPES_D1;
+				configuration = new byte[configurationlength];
 				Array.Copy (filedata, fileoffset, configuration, 0, configurationlength);
 				fileoffset += configurationlength;
 			}
@@ -624,6 +635,10 @@ namespace dxxplreditor
 			if (descentversion == 1) {
 				filedata_l.Add (BitConverter.GetBytes (default_difficulty));
 				filedata_l.Add (BitConverter.GetBytes (auto_leveling));
+				if (savegame_version <= 5) {
+					Console.WriteLine ("ERROR: savegame_version <=5.  Old style highest level info not supported.");
+					return(-1);
+				}
 			}
 			if (descentversion == 2) { // d2
 				filedata_l.AddByte ((byte) default_difficulty);  //byte for d2
@@ -641,6 +656,11 @@ namespace dxxplreditor
 				filedata_l.Add (encBinary.GetBytes(tmpMission.mission_name));
 				//Console.WriteLine ("'{0}':{1} {2}", tmpMission.mission_name, tmpMission.mission_name.Length, tmpMission.maximum_level);
 				filedata_l.AddByte (tmpMission.maximum_level);
+			}
+			if (descentversion == 1) {
+				if (savegame_version != 7) {
+					filedata_l.Add (saved_game_data_shareware);
+				}
 			}
 			filedata_l.Add (encBinary.GetBytes (multiplayer_macro_f9));
 			filedata_l.Add (encBinary.GetBytes (multiplayer_macro_f10));
@@ -696,14 +716,6 @@ namespace dxxplreditor
 
 			File.WriteAllBytes (filename + ".new", filedata_arr_truncated);
 			Console.WriteLine ("Wrote new PLR file to {0}.new", filename);
-
-			//fileStream = new FileStream (fileName + ".new", FileMode.Create);
-			//FileStream.
-
-			if (descentversion != 2) {
-				Console.WriteLine ("WARNING: Exporting of PLR file is not completed for descent 1 yet");
-				return (-1);
-			}
 
 			return(0);
 		}

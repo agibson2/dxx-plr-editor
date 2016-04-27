@@ -7,11 +7,9 @@ namespace dxxplreditor
 	{
 		public static void Main (string[] args)
 		{
-			const string default_filename = "Z:/Games/Descent2/static.plr";
+			const string default_filename = "Z:/Games/Descent/static.plr";
 
 			string filename;
-
-			Console.WriteLine ("args length =" + args.Length);
 
 			if (args.Length > 0) {
 				filename = args [0];
