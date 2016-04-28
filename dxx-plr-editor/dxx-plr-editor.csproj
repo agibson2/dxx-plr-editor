@@ -39,6 +39,7 @@
     <Compile Include="PlrMission.cs" />
     <Compile Include="PlrWeaponOrder.cs" />
     <Compile Include="ListAddByte.cs" />
+    <Compile Include="ParseArgs.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

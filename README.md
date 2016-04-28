@@ -14,8 +14,18 @@ before to make sure I am parsing the PLR file properly.  Descent 1 and Descent 2
 differently in different sections of the PLR file and I want to be able to handle both in one
 binary.
 
-Current status is that it can read in the D1 and D2 PLR files from a full version of Descent 1 or
-Descent 2 from d2x rebirth and d2x retro and writes it back out to the same directory with a .new
-extension appended to it to make sure we don't overwrite the original PLR file (yet).  It also
-displays what was parsed.  The shareware version saves things differently so for now I try to
+Current status...
+
+- Reads d1 and d2 PLR files of full version (not shareware PLR files)
+- Prints parsed information from the PLR file (debug output)
+- Writes a new PLR file with a .new extension to the same directory
+- Can change primary autoselect for Descent 2 PLR files using /primaryautoselect option
+   example:  dxx-plr-editor.exe /primaryautoselect gauss,plasma,superlaser C:\descent2\myname.plr
+                    The order would be gauss then plasma then superlaser and all other primary
+					weapons will not be autoselected.
+
+Valid primary weapon names for D2 are:
+    laser vulcan spreadfire plasma fusion superlaser gauss helix phoenix omega
+
+The shareware version saves things differently so for now I try to
 determine that it is shareware PLR file and stop importing the PLR file.

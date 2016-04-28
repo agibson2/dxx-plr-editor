@@ -40,6 +40,9 @@ namespace dxxplreditor
 		public int descentversion = -1;
 		bool isbigendianfile = false;
 		int imported_filesize = 0;
+		string[] valid_d1_primary_weapons = { "omega", "superlaser", "spreadfire", "plasma", "laser", "fusion", "vulcan" };
+		string[] valid_d1_secondary_weapons = { "mega", "smart", "homing", "concussion" };
+		string[] valid_d2_primary_weapons = { "laser", "vulcan", "spreadfire", "plasma", "fusion", "superlaser", "gauss", "helix", "phoenix", "omega" };
 		// end non PLR file info
 
 		public Int32 signature;
@@ -376,8 +379,8 @@ namespace dxxplreditor
 					++tmploop;
 				}
 				if (savegame_version >= 16) {
-					Console.WriteLine (" cockpit_3dview1: ", cockpit_3dview1);
-					Console.WriteLine (" cockpit_3dview2: ", cockpit_3dview2);
+					Console.WriteLine (" cockpit_3dview1: " + cockpit_3dview1);
+					Console.WriteLine (" cockpit_3dview2: " + cockpit_3dview2);
 				}
 
 				Console.WriteLine (" lifetimerankings_num_kills(2): " + lifetimerankings_num_kills);
@@ -546,6 +549,7 @@ namespace dxxplreditor
 			}
 			if (descentversion == 2) {
 				int configurationlength = (savegame_version < 20 ? PLR_MAX_CONTROLS_D1 : PLR_MAX_CONTROLS_D2) * PLR_CONTROL_MAX_TYPES_D2;
+				configuration = new byte[configurationlength];
 				Array.Copy (filedata, fileoffset, configuration, 0, configurationlength);
 				fileoffset += configurationlength;
 			}
@@ -718,6 +722,74 @@ namespace dxxplreditor
 			Console.WriteLine ("Wrote new PLR file to {0}.new", filename);
 
 			return(0);
+		}
+
+		public int SetPrimary_auto_select (string [] weapons) {
+
+			if (descentversion != 2) {
+				Console.WriteLine ("Can't set primary auto select weapon search order in Descent 1 (yet)");
+				return(-1);
+			}
+			Dictionary<string, byte> weaponDict = new Dictionary<string, byte> ();
+			int weaponLocLoop = 0;
+			foreach (string weapon in weapons) {
+				int foundindex = Array.IndexOf( valid_d2_primary_weapons, weapon);
+				//Console.WriteLine ("foundindex=" + foundindex);
+				if( foundindex >= 0) {
+					byte weaponfoundcount;
+					weaponDict.TryGetValue(weapon, out weaponfoundcount);
+					weaponDict [weapon] = ++weaponfoundcount;
+					if (weaponDict [weapon] > 1) {
+						Console.WriteLine ("SetPrimary_auto_select: '{0}' listed more than once", weapon);
+						return(-1);
+					}
+
+					weapons_order_arr[weaponLocLoop].primaryOrder = (byte) foundindex;
+						
+				} else {
+					Console.WriteLine("SetPrimary_auto_select: Invalid weapon '{0}'", weapon);
+					string weaponprintlist = "";
+					string[] thisdescentversionweaponlist;
+					if (descentversion == 1) {
+						thisdescentversionweaponlist = valid_d1_primary_weapons;
+					} else {
+						thisdescentversionweaponlist = valid_d2_primary_weapons;
+					}
+					foreach (string weap in thisdescentversionweaponlist) {
+						weaponprintlist = weaponprintlist + weap + " ";
+					}
+					Console.WriteLine ("Valid Descent {0} weapons are... {1}", descentversion, weaponprintlist);
+					return(-1);
+				}
+
+				weaponLocLoop++;
+			}
+				
+			weapons_order_arr [weaponLocLoop++].primaryOrder = 255;  // set the separator to designate everything below this point should not be autoselected
+			foreach(string weapon in valid_d2_primary_weapons) {
+				if (!(Array.Exists (weapons, x => x == weapon))) {
+					int foundindex = Array.IndexOf( valid_d2_primary_weapons, weapon);
+					weapons_order_arr [weaponLocLoop++].primaryOrder = (byte) foundindex;
+					}
+			}
+
+			/*foreach (string weapon in weapons) {
+				if( Array.Exists( valid_d2_primary_weapons, x => x == weapon)) {
+					byte tmpcount;
+					weaponDict.TryGetValue(weapon, out tmpcount);
+					weaponDict [weapon] = ++tmpcount;
+					if (weaponDict [weapon] > 1) {
+						Console.WriteLine ("SetPrimary_auto_select: '{0}' listed more than once", weapon);
+						return(-1);
+					}
+
+				} else {
+					Console.WriteLine("SetPrimary_auto_select: Invalid weapon '{0}", weapon);
+					return(-1);
+				}
+			}*/
+			
+			return(1);
 		}
 	}
 }

@@ -5,23 +5,36 @@ namespace dxxplreditor
 {
 	class MainClass
 	{
-		public static void Main (string[] args)
+		public static int Main (string[] args)
 		{
-			const string default_filename = "Z:/Games/Descent/static.plr";
-
-			string filename;
-
-			if (args.Length > 0) {
-				filename = args [0];
-			} else {
-				filename = default_filename;
+			ParseArgs pargs = new ParseArgs();
+			if (pargs.Parse(args) == -1) {
+				Console.WriteLine ("ERROR: ParseArgs failed");
+				return(1);
 			}
 
 			PlrClass plr = new PlrClass();
-			plr.ImportFromFile (filename);
+
+			if(!(File.Exists(pargs.filename))) {
+				Console.WriteLine ("ERROR: {0} file not found", pargs.filename);
+				return(1);
+			}
+
+			plr.ImportFromFile (pargs.filename);
 			plr.Dump ();
-			plr.ExportToFile (filename);
+
+			if (pargs.primaryautoselect != null) {
+				if (plr.SetPrimary_auto_select (pargs.primaryautoselect) == -1) {
+					Console.WriteLine ("ERROR: Problem setting primaryautoselect");
+					return(1);
+				}
+			}
+
+			plr.Dump ();
+			plr.ExportToFile (pargs.filename);
 			Console.ReadKey ();
+
+			return(0);
 		}
 	}
 }
