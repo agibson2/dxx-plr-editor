@@ -21,7 +21,19 @@ namespace dxxplreditor
 			}
 
 			plr.ImportFromFile (pargs.filename);
-			plr.Dump ();
+
+			if (pargs.quiet) {
+				plr.displayInfoMessages = false;
+			}
+				
+			if (pargs.debug) {
+				plr.debugEnabled = true;
+			}
+
+			if (plr.debugEnabled) {
+				Console.WriteLine ("*********** Debug: Dump of PLR file contents BEFORE changes ************");
+				plr.Dump ();
+			}
 
 			if (pargs.primaryautoselect != null) {
 				if (plr.SetPrimary_auto_select (pargs.primaryautoselect) == -1) {
@@ -30,9 +42,23 @@ namespace dxxplreditor
 				}
 			}
 
-			plr.Dump ();
+			if (pargs.secondaryautoselect != null) {
+				if (plr.SetSecondary_auto_select (pargs.secondaryautoselect) == -1) {
+					Console.WriteLine ("ERROR: Problem setting secondaryautoselect");
+					return(1);
+				}
+			}
+
+			if (plr.debugEnabled) {
+				Console.WriteLine ("*********** Debug: Dump of PLR file contents AFTER changes ************");
+				plr.Dump ();
+			}
+
 			plr.ExportToFile (pargs.filename);
-			Console.ReadKey ();
+			if (plr.debugEnabled) {
+				Console.WriteLine ("Press a key to exit.");
+				Console.ReadKey ();
+			}
 
 			return(0);
 		}

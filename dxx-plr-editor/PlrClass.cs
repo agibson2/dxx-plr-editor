@@ -37,12 +37,16 @@ namespace dxxplreditor
 		//}
 
 		// non PLR file info
+		public bool debugEnabled = false;
+		public bool displayInfoMessages = true;
 		public int descentversion = -1;
 		bool isbigendianfile = false;
 		int imported_filesize = 0;
+		// order of weapons below matters!
 		string[] valid_d1_primary_weapons = { "omega", "superlaser", "spreadfire", "plasma", "laser", "fusion", "vulcan" };
-		string[] valid_d1_secondary_weapons = { "mega", "smart", "homing", "concussion" };
+		string[] valid_d1_secondary_weapons = { "mega", "smart", "homing", "concussion", "proximity" };
 		string[] valid_d2_primary_weapons = { "laser", "vulcan", "spreadfire", "plasma", "fusion", "superlaser", "gauss", "helix", "phoenix", "omega" };
+		string[] valid_d2_secondary_weapons = { "concussion", "homing", "proximity", "smartmissile", "mega", "flash", "guided", "smartmine", "mercury", "earthshaker" };
 		// end non PLR file info
 
 		public Int32 signature;
@@ -719,7 +723,9 @@ namespace dxxplreditor
 			}
 
 			File.WriteAllBytes (filename + ".new", filedata_arr_truncated);
-			Console.WriteLine ("Wrote new PLR file to {0}.new", filename);
+			if (displayInfoMessages) {
+				Console.WriteLine ("Wrote new PLR file to {0}.new", filename);
+			}
 
 			return(0);
 		}
@@ -758,7 +764,7 @@ namespace dxxplreditor
 					foreach (string weap in thisdescentversionweaponlist) {
 						weaponprintlist = weaponprintlist + weap + " ";
 					}
-					Console.WriteLine ("Valid Descent {0} weapons are... {1}", descentversion, weaponprintlist);
+					Console.WriteLine ("Valid Descent {0} primary weapons are... {1}", descentversion, weaponprintlist);
 					return(-1);
 				}
 
@@ -773,22 +779,57 @@ namespace dxxplreditor
 					}
 			}
 
-			/*foreach (string weapon in weapons) {
-				if( Array.Exists( valid_d2_primary_weapons, x => x == weapon)) {
-					byte tmpcount;
-					weaponDict.TryGetValue(weapon, out tmpcount);
-					weaponDict [weapon] = ++tmpcount;
+			return(1);
+		}
+
+		public int SetSecondary_auto_select (string [] weapons) {
+
+			if (descentversion != 2) {
+				Console.WriteLine ("Can't set secondary auto select weapon search order in Descent 1 (yet)");
+				return(-1);
+			}
+			Dictionary<string, byte> weaponDict = new Dictionary<string, byte> ();
+			int weaponLocLoop = 0;
+			foreach (string weapon in weapons) {
+				int foundindex = Array.IndexOf( valid_d2_secondary_weapons, weapon);
+				//Console.WriteLine ("foundindex=" + foundindex);
+				if( foundindex >= 0) {
+					byte weaponfoundcount;
+					weaponDict.TryGetValue(weapon, out weaponfoundcount);
+					weaponDict [weapon] = ++weaponfoundcount;
 					if (weaponDict [weapon] > 1) {
-						Console.WriteLine ("SetPrimary_auto_select: '{0}' listed more than once", weapon);
+						Console.WriteLine ("SetSecondary_auto_select: '{0}' listed more than once", weapon);
 						return(-1);
 					}
 
+					weapons_order_arr[weaponLocLoop].secondaryOrder = (byte) foundindex;
 				} else {
-					Console.WriteLine("SetPrimary_auto_select: Invalid weapon '{0}", weapon);
+					Console.WriteLine("SetSecondary_auto_select: Invalid weapon '{0}'", weapon);
+					string weaponprintlist = "";
+					string[] thisdescentversionweaponlist;
+					if (descentversion == 1) {
+						thisdescentversionweaponlist = valid_d1_secondary_weapons;
+					} else {
+						thisdescentversionweaponlist = valid_d2_secondary_weapons;
+					}
+					foreach (string weap in thisdescentversionweaponlist) {
+						weaponprintlist = weaponprintlist + weap + " ";
+					}
+					Console.WriteLine ("Valid Descent {0} secondary weapons are... {1}", descentversion, weaponprintlist);
 					return(-1);
 				}
-			}*/
-			
+
+				weaponLocLoop++;
+			}
+
+			weapons_order_arr [weaponLocLoop++].secondaryOrder = 255;  // set the separator to designate everything below this point should not be autoselected
+			foreach(string weapon in valid_d2_secondary_weapons) {
+				if (!(Array.Exists (weapons, x => x == weapon))) {
+					int foundindex = Array.IndexOf( valid_d2_secondary_weapons, weapon);
+					weapons_order_arr [weaponLocLoop++].secondaryOrder = (byte) foundindex;
+				}
+			}
+
 			return(1);
 		}
 	}
