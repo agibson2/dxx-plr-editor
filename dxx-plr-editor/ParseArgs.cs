@@ -67,8 +67,8 @@ namespace dxxplreditor
 						count++;
 					} else if (args [count].Equals ("/help")) {
 						Console.WriteLine ("");
-						Console.WriteLine ("dxx-plr-editor.exe [/autoselectprimary <weapon,list>] [/autoselectsecondary <weapon,list>] player.plr");
-						Console.WriteLine ("  v0.1.5");
+						Console.WriteLine ("dxx-plr-editor.exe [/primaryautoselect <weapon,list>] [/secondaryautoselect <weapon,list>] player.plr");
+						Console.WriteLine ("  v0.1.6");
 						Console.WriteLine ("  Command line .PLR file editor tool");
 						Console.WriteLine ("  /primaryautoselect  (requires , separated parameter list of primary weapons)");
 						Console.WriteLine ("         d2: laser,vulcan,spreadfire,plasma,fusion,superlaser,gauss");
