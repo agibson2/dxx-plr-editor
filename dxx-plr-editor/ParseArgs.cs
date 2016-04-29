@@ -44,8 +44,8 @@ namespace dxxplreditor
 						//	Console.WriteLine ("ERROR: /primaryautoselect option requires a parameter with a list of weapons separated by ,");
 						//	return(-1);
 						//}
-
-						return(-1);
+						//
+						//return(-1);
 					} else if (args [count].Equals ("/f9")) {
 						Console.WriteLine("ERROR: /f9 not implemented yet");
 						return(-1);
