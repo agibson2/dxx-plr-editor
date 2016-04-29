@@ -17,15 +17,21 @@ binary.
 Current status...
 
 - Reads d1 and d2 PLR files of full version (not shareware PLR files)
-- Prints parsed information from the PLR file (debug output)
+- Prints parsed information from the PLR file (with /debug option)
 - Writes a new PLR file with a .new extension to the same directory
 - Can change primary autoselect for Descent 2 PLR files using /primaryautoselect option
    example:  dxx-plr-editor.exe /primaryautoselect gauss,plasma,superlaser C:\descent2\myname.plr
                     The order would be gauss then plasma then superlaser and all other primary
 					weapons will not be autoselected.
+- Can change secondary autoselect for Descent 2 PLR files using /secondaryautoselect option
+   example:  dxx-plr-editor.exe /secondaryautoselect mercury,smartmissile,mega C:\descent2\myname.plr
+                    The order would be mercury then smartmissile then mega and all other secondary
+					weapons will not be autoselected.
 
 Valid primary weapon names for D2 are:
     laser vulcan spreadfire plasma fusion superlaser gauss helix phoenix omega
-
+Valid seconary weapon names for D2 are:
+    concussion homing proximity smartmissile mega flash guided smartmine mercury earthshaker
+	
 The shareware version saves things differently so for now I try to
 determine that it is shareware PLR file and stop importing the PLR file.
