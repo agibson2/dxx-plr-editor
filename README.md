@@ -9,29 +9,28 @@ different scenarios.  The batch file would first call this program to change the
 launch d1 or d2.  Sometimes you need macros for group messages like TIME OUT, etc.  Other times
 you just might want messages for fun like :), etc.
 
-I wanted to be able to read in the entire PLR file and then write it back out exactly as it was
-before to make sure I am parsing the PLR file properly.  Descent 1 and Descent 2 store data
-differently in different sections of the PLR file and I want to be able to handle both in one
-binary.
-
 Current status...
 
-- Reads d1 and d2 PLR files of full version (not shareware PLR files)
-- Prints parsed information from the PLR file (with /debug option)
-- Writes a new PLR file with a .new extension to the same directory
-- Can change primary autoselect for Descent 2 PLR files using /primaryautoselect option
-   example:  dxx-plr-editor.exe /primaryautoselect gauss,plasma,superlaser C:\descent2\myname.plr
+- Reads d1 and d2 .PLR files of full version (not shareware PLR files)
+- Prints parsed information from .PLR file and other debug info with /debug option
+- Writes a new PLR file with a .new extension to the same directory by default to be safe
+   (can overwrite existing .PLR file with /overwrite option   BACK UP YOUR .PLR file first just in case!)
+- Can change primary autoselect for Descent 2 .PLR files using /primaryautoselect option
+   example:  dxx-plr-editor.exe /primaryautoselect gauss,plasma,superlaser "C:\descent 2\myname.plr"
                     The order would be gauss then plasma then superlaser and all other primary
 					weapons will not be autoselected.
-- Can change secondary autoselect for Descent 2 PLR files using /secondaryautoselect option
-   example:  dxx-plr-editor.exe /secondaryautoselect mercury,smartmissile,mega C:\descent2\myname.plr
+- Can change secondary autoselect for Descent 2 .PLR files using /secondaryautoselect option
+   example:  dxx-plr-editor.exe /secondaryautoselect mercury,smartmissile,mega "C:\descent 2\myname.plr"
                     The order would be mercury then smartmissile then mega and all other secondary
 					weapons will not be autoselected.
-
+- Can change f9, f10, f11, and f12 macros with /f9 "Oh no you got me!" /f10 "Ouch!", etc
+   (supports color too... run program with /help to see valid colors)
+   Example...  dxx-plr-editor.exe /f9 "/rThis is dark red/wThis is white" "C:\games\descent 2\myname.plr"
+   
 Valid primary weapon names for D2 are:
     laser vulcan spreadfire plasma fusion superlaser gauss helix phoenix omega
-Valid seconary weapon names for D2 are:
+Valid secondary weapon names for D2 are:
     concussion homing proximity smartmissile mega flash guided smartmine mercury earthshaker
 	
 The shareware version saves things differently so for now I try to
-determine that it is shareware PLR file and stop importing the PLR file.
+determine that it is shareware PLR file and stop importing the .PLR file.

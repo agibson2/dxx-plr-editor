@@ -37,6 +37,7 @@ namespace dxxplreditor
 		//}
 
 		// non PLR file info
+		public bool overwriteExistingFile = false;
 		public bool debugEnabled = false;
 		public bool displayInfoMessages = true;
 		public int descentversion = -1;
@@ -255,24 +256,129 @@ namespace dxxplreditor
 			num_mission_protocol_entries = newNum_mission_protocol_entries;
 		}
 
-		public void SetMultiplayer_macro_f9( string newMultiplayer_macro_f9 )
-		{
-			multiplayer_macro_f9 = newMultiplayer_macro_f9;
+		public string EncodeColors( string toEncode ) {
+			if (debugEnabled == true) { Console.WriteLine ("EncodeColors: {0}", toEncode); };
+			Encoding f9Binary = Encoding.GetEncoding (28591);
+			byte[] newString = new byte[35];
+			bool escape = false;
+			//byte colordefault = 100;
+			//byte color = 0;
+			byte currposition = 0;
+			foreach (char c in toEncode) {
+				//Console.WriteLine ("EncodeColors: c={0}", c);
+				if(currposition >= newString.Length - 1) {
+					Console.WriteLine("WARNING: '{0}' too long. Truncated to string below", toEncode);
+					Console.WriteLine("         '{0}'", f9Binary.GetString(newString));
+					break;
+				}
+				if (c == '/') {
+					if (escape == true) {
+						// remove the previos 0x01 with the /
+						newString [--currposition] = (byte) c;
+						escape = false;
+					} else {
+						newString [currposition] = 0x01;
+						escape = true;
+					}
+				} else {
+					if(escape == true) {
+						escape=false;
+						switch(c) {
+						case 'r':
+							newString[currposition] = 0xc3;  //dark red
+							break;
+
+						case 'w':
+							newString[currposition] = 0x01;  //white
+							break;
+						
+						case 'y':
+							newString[currposition] = 0x4b;  //yellow
+							break;
+
+						case 'R':
+							newString[currposition] = 0x69; //bright red
+							break;
+
+						case 'g':
+							newString[currposition] = 0x3c; //dark green
+							break;
+
+						case 'O':
+							newString[currposition] = 0x78; //bright orange
+							break;
+						
+						case 'p':
+							newString[currposition] = 0xf0; //purple
+							break;
+
+						case 'P':
+							newString[currposition] = 0x0f; //bright purple
+							break;
+						
+						default:
+							Console.WriteLine("ERROR: Invalid color '{0}' trying to parse color", c);
+							return(null);
+							//break;
+						}
+					} else {
+						newString[currposition] = (byte) c;
+					}
+				}
+				
+				currposition++;
+			}
+
+			newString [currposition] = 0x00;
+
+			string convertedString;
+			convertedString = f9Binary.GetString (newString);
+			if (debugEnabled == true) { Console.WriteLine ("EncodeColors returned '{0}'", convertedString); }
+			return(convertedString);
 		}
 
-		public void SetMultiplayer_macro_f10( string newMultiplayer_macro_f10 )
+		public int SetMultiplayer_macro_f9( string newMultiplayer_macro_f9 )
 		{
-			multiplayer_macro_f10 = newMultiplayer_macro_f10;
+			multiplayer_macro_f9 = EncodeColors (newMultiplayer_macro_f9);
+			if (multiplayer_macro_f9 == null) {
+				return(-1);
+			} else {
+				return(1);
+			}
+			//multiplayer_macro_f9 = newMultiplayer_macro_f9;
 		}
 
-		public void SetMultiplayer_macro_f11( string newMultiplayer_macro_f11 )
+		public int SetMultiplayer_macro_f10( string newMultiplayer_macro_f10 )
 		{
-			multiplayer_macro_f11 = newMultiplayer_macro_f11;
+			multiplayer_macro_f10 = EncodeColors (newMultiplayer_macro_f10);
+			if (multiplayer_macro_f10 == null) {
+				return(-1);
+			} else {
+				return(1);
+			}
+			//multiplayer_macro_f9 = newMultiplayer_macro_f9;multiplayer_macro_f10 = newMultiplayer_macro_f10;
 		}
 
-		public void SetMultiplayer_macro_f12( string newMultiplayer_macro_f12 )
+		public int SetMultiplayer_macro_f11( string newMultiplayer_macro_f11 )
 		{
-			multiplayer_macro_f12 = newMultiplayer_macro_f12;
+			multiplayer_macro_f11 = EncodeColors (newMultiplayer_macro_f11);
+			if (multiplayer_macro_f11 == null) {
+				return(-1);
+			} else {
+				return(1);
+			}
+			//multiplayer_macro_f9 = newMultiplayer_macro_f9;multiplayer_macro_f11 = newMultiplayer_macro_f11;
+		}
+
+		public int SetMultiplayer_macro_f12( string newMultiplayer_macro_f12 )
+		{
+			multiplayer_macro_f12 = EncodeColors (newMultiplayer_macro_f12);
+			if (multiplayer_macro_f12 == null) {
+				return(-1);
+			} else {
+				return(1);
+			}
+			//multiplayer_macro_f9 = newMultiplayer_macro_f9;multiplayer_macro_f12 = newMultiplayer_macro_f12;
 		}
 
 		public void SetObsolete_winjoy_map( byte newObsolete_winjoy_map )
@@ -722,9 +828,16 @@ namespace dxxplreditor
 				Console.WriteLine ("WARNING: imported filesize was {0}.  Exported filesize is {1}.", imported_filesize, filedata_arr_truncated.Length);
 			}
 
-			File.WriteAllBytes (filename + ".new", filedata_arr_truncated);
+			string filetowrite;
+			if (overwriteExistingFile == true) {
+				filetowrite = filename;
+			} else {
+				filetowrite = filename + ".new";
+			}
+
+			File.WriteAllBytes (filetowrite, filedata_arr_truncated);
 			if (displayInfoMessages) {
-				Console.WriteLine ("Wrote new PLR file to {0}.new", filename);
+				Console.WriteLine ("Wrote new PLR file to {0}", filetowrite);
 			}
 
 			return(0);

@@ -8,8 +8,12 @@ namespace dxxplreditor
 		public static int Main (string[] args)
 		{
 			ParseArgs pargs = new ParseArgs();
-			if (pargs.Parse(args) == -1) {
+			int pargsRetval = pargs.Parse (args);
+			if (pargsRetval == -1) {
 				Console.WriteLine ("ERROR: ParseArgs failed");
+				return(1);
+			} else if (pargsRetval == -2) {
+				// help message requested so just exit
 				return(1);
 			}
 
@@ -22,6 +26,10 @@ namespace dxxplreditor
 
 			plr.ImportFromFile (pargs.filename);
 
+			if (pargs.overwrite) {
+				plr.overwriteExistingFile = true;
+			}
+
 			if (pargs.quiet) {
 				plr.displayInfoMessages = false;
 			}
@@ -33,6 +41,30 @@ namespace dxxplreditor
 			if (plr.debugEnabled) {
 				Console.WriteLine ("*********** Debug: Dump of PLR file contents BEFORE changes ************");
 				plr.Dump ();
+			}
+
+			if (pargs.f9 != null) {
+				if (plr.SetMultiplayer_macro_f9 (pargs.f9) == -1) {
+					return(1);
+				}
+			}
+
+			if (pargs.f10 != null) {
+				if (plr.SetMultiplayer_macro_f10 (pargs.f10) == -1) {
+					return(1);
+				}
+			}
+
+			if (pargs.f11 != null) {
+				if (plr.SetMultiplayer_macro_f11 (pargs.f11) == -1) {
+					return(1);
+				}
+			}
+
+			if (pargs.f12 != null) {
+				if (plr.SetMultiplayer_macro_f12 (pargs.f12) == -1) {
+					return(1);
+				}
 			}
 
 			if (pargs.primaryautoselect != null) {
