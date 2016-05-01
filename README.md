@@ -37,6 +37,55 @@ determine that it is shareware PLR file and stop importing the .PLR file.
 
 This is the command line I use to create my macros and primary / secondary auto select...
 
+```
 dxx-plr-editor.exe /overwrite /f9 "/R}/O|/R->" /f10 "/R}/O|/w./R-(/w..." /f11 "/R}/O|/R-//" /f12 "/O*** /RTIMEOUT! TIMEOUT! /O***" /primaryautoselect omega,gauss,plasma,spreadfire,vulcan,superlaser,laser /secondaryautoselect mega,smart,mercury,homing "z:\games\descent2\static.plr"
+```
 
+Help output via dxx-plr-editor.exe /help
 
+```
+dxx-plr-editor.exe v0.2.0 - Command line Descent 1 and 2 .PLR file editor tool
+
+dxx-plr-editor.exe [/primaryautoselect weaponlist] [/secondaryautoselect weaponlist
+                   [/f9 text] [/f10 text] [/f11 text] [/f12 text] [/overwrite]
+                   [/debug] filename.plr
+
+  Options:
+    /primaryautoselect weaponlist  Change primary autoselect list (, separated list)
+         d2 primary weaponlist: laser,vulcan,spreadfire,plasma,fusion
+                                superlaser,gauss,helix,phoenix,omega
+
+    /secondaryautoselect weaponlist Change secondary autoselect list (, separated list
+         d2 secondary weaponlist: concussion,homing,proximity,smartmissile,mega
+                                  flash,guided,smartmine,mercury,earthshaker
+
+    /f9 <text>     Sets F9 macro text (supports color using color format below)
+    /f10 <text>    Sets F10 macro text (supports color using color format below)
+    /f11 <text>    Sets F11 macro text (supports color using color format below)
+    /f12 <text>    Sets F12 macro text (supports color using color format below)
+
+    /debug         Print lots of debug output
+    /overwrite     Overwrite the existing .PLR instead of creating a .new file
+
+  Examples:
+    dxx-plr-editor.exe /primaryautoselect omega,plasma /secondaryautoselect mercury,smartmissile "C:\descent 2\adam.plr"
+      Sets the primary autoselect so that omega is first then plasma.
+      Sets the secondary autoselect so that mercury is first and then smartmissile.
+
+    dxx-plr-editor.exe /f9 "/rDARKRED/wWHITE/OBRIGHTORANGE/pDARKPURPLE" /f10 "/OTHIS is ORANGE" C:\adam.plr
+      Sets f9 macro to 'DARKRED WHITE BRIGHTORANGE DARKPURPLE' with each word
+        a different color.
+
+    Macro f9 through f12 color format:  (more colors to come soon)
+      /r = dark red, /R = bright red, /y = yellow, /w = white, /o = orange
+      /p = dark purple, /P = bright purple, /g = dark green
+      *To print a / character use two //... /f9 "this is a //"
+
+   NOTES:  By default the new .plr file is written to a new file in the same directory as
+           as the original .PLR file with a .new extension to be safe.  You can make it
+           write over the existing file with the /overwrite option.  Make sure you
+           backup your existing .PLR file just in case there is a bug and this editor
+           corrupts your .PLR file.  I am not aware of any issues but just in case...
+
+           /primaryautoselect and /secondaryautoselect only support d2 .PLR files currently
+```
