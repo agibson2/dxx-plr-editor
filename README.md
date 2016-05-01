@@ -34,3 +34,7 @@ Valid secondary weapon names for D2 are:
 	
 The shareware version saves things differently so for now I try to
 determine that it is shareware PLR file and stop importing the .PLR file.
+
+This is the command line I use to create my macros and primary / secondary auto select...
+
+dxx-plr-editor.exe /overwrite /f9 "/R}/O|/R->" /f10 "/R}/O|/w./R-(/w..." /f11 "/R}/O|/R-//" /f12 "/O*** /RTIMEOUT! TIMEOUT! /O***" /primaryautoselect omega,gauss,plasma,spreadfire,vulcan,superlaser,laser /secondaryautoselect mega,smart,mercury,homing "z:\games\descent2\static.plr"
