@@ -1,6 +1,6 @@
 ﻿/*
  *  Program to import and export Descent 1 and Descent 2 PLR files
- *    This program will eventually be able to change details of the PLR file
+ *    This program will can change details of the PLR file
  *    from the command line for instance changing descent macros and allowing
  *    color in them easily using command line switches.  You can have a batch
  *    file that sets F9 through F12 macros depending on what you plan to do.
@@ -256,11 +256,27 @@ namespace dxxplreditor
 			num_mission_protocol_entries = newNum_mission_protocol_entries;
 		}
 
+		public bool isDescentVersionValid ()
+		{
+			if ((descentversion == 1) || (descentversion == 2)) {
+				return(true);
+			} else {
+				return(false);
+			}
+		}
 		public string EncodeColors( string toEncode ) {
-			if (debugEnabled == true) { Console.WriteLine ("EncodeColors: {0}", toEncode); };
+			if (isDescentVersionValid () == false) {
+				Console.WriteLine ("ERROR: Descent version not known yet so can't EncodeColors as D1 and D2 have different color palette");
+				return(null);
+			}
+
+			if (debugEnabled == true) { Console.WriteLine ("EncodeColors Descent {0}: {0}", descentversion, toEncode); };
 			Encoding f9Binary = Encoding.GetEncoding (28591);
 			byte[] newString = new byte[35];
 			bool escape = false;
+			bool escapehex = false;
+			byte escapehexposition = 0;
+			byte[] hexchars = new byte[2];
 			//byte colordefault = 100;
 			//byte color = 0;
 			byte currposition = 0;
@@ -276,57 +292,103 @@ namespace dxxplreditor
 						// remove the previos 0x01 with the /
 						newString [--currposition] = (byte) c;
 						escape = false;
+						currposition++;
 					} else {
 						newString [currposition] = 0x01;
 						escape = true;
+						currposition++;
 					}
 				} else {
 					if(escape == true) {
-						escape=false;
-						switch(c) {
-						case 'r':
-							newString[currposition] = 0xc3;  //dark red
-							break;
+						if(c == 'x') {
+							escapehex = true;
+							escapehexposition = 0;
+						} else if (escapehex == true) {
+							if ((c >= '0' && c <= '9')
+								|| (c >= 'a' && c <= 'f')
+								|| (c >= 'A' && c <= 'F')) {
+								if (escapehexposition == 0) {
+									hexchars [0] = (byte)c;
+									escapehexposition = 1;
+								} else {
+									hexchars [1] = (byte)c;
+									newString [currposition] = (byte)Convert.ToUInt16 (System.Text.Encoding.UTF8.GetString (hexchars), 16);
+									escapehexposition = 0;
+									escape = false;
+									escapehex = false;
+									currposition++;
+								}
+							} else {
+								Console.WriteLine ("ERROR: Macro color /x## invalid.  /x must be followed by a 0 through 9 or a through f");
+								escapehex = false;
+								escape = false;
+								escapehexposition = 0;
+								return(null);
+							}
+						} else {
+							byte thiscolor = 0;
+							escape=false;
+							switch(c) {
+							case 'r':  // red
+								thiscolor = descentversion == 2 ? (byte)0xc3 : (byte)0xc9;
+								break;
 
-						case 'w':
-							newString[currposition] = 0x01;  //white
-							break;
-						
-						case 'y':
-							newString[currposition] = 0x4b;  //yellow
-							break;
+							case 'w':  // white
+								thiscolor = descentversion == 2 ? (byte)0x01 : (byte)0x31;
+								break;
+							
+							case 'b':  // blue
+								thiscolor = descentversion == 2 ? (byte)0x0a : (byte)0x53;
+								break;
 
-						case 'R':
-							newString[currposition] = 0x69; //bright red
-							break;
+							case 'Y':  // bright yellow
+								thiscolor = descentversion == 2 ? (byte)0x4d : (byte)0xb0;
+								break;
 
-						case 'g':
-							newString[currposition] = 0x3c; //dark green
-							break;
+							case 'R':  // bright red
+								thiscolor = descentversion == 2 ? (byte)0x69 : (byte)0xc2;
+								break;
 
-						case 'O':
-							newString[currposition] = 0x78; //bright orange
-							break;
-						
-						case 'p':
-							newString[currposition] = 0xf0; //purple
-							break;
+							case 'g':  // green
+								thiscolor = descentversion == 2 ? (byte)0x40 : (byte)0x94;
+								break;
+							
+							case 'G':  // bright green
+								thiscolor = descentversion == 2 ? (byte)0x8d : (byte)0x99;
+								break;
 
-						case 'P':
-							newString[currposition] = 0x0f; //bright purple
-							break;
-						
-						default:
-							Console.WriteLine("ERROR: Invalid color '{0}' trying to parse color", c);
-							return(null);
-							//break;
+							case 'o':  // orange
+								thiscolor = descentversion == 2 ? (byte)0x4b : (byte)0xd1;
+								break;
+
+							case 'O':  // bright orange
+								thiscolor = descentversion == 2 ? (byte)0x78 : (byte)0xbe;
+								break;
+							
+							case 'p':  // purple
+								thiscolor = descentversion == 2 ? (byte)0xf0 : (byte)0xe9;
+								break;
+
+							case 'P':  // bright purple
+								thiscolor = descentversion == 2 ? (byte)0x0f : (byte)0xe6;
+								break;
+							
+							default:
+								Console.WriteLine("ERROR: Invalid color '{0}' trying to parse color", c);
+								return(null);
+								//break;
+							}
+
+							newString[currposition] = thiscolor;
+							currposition++;
 						}
 					} else {
 						newString[currposition] = (byte) c;
+						currposition++;
 					}
 				}
 				
-				currposition++;
+				//currposition++;
 			}
 
 			newString [currposition] = 0x00;

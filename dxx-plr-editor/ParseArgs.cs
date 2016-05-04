@@ -108,7 +108,7 @@ namespace dxxplreditor
 					} else if (args [count].Equals ("/help")) {
 						if (debug == true) { Console.WriteLine ("OPTION /help"); }
 						Console.WriteLine ("");
-						Console.WriteLine ("dxx-plr-editor.exe v0.2.0 - Command line Descent 1 and 2 .PLR file editor tool");
+						Console.WriteLine ("dxx-plr-editor.exe v0.2.1 - Command line Descent 1 and 2 .PLR file editor tool");
 						Console.WriteLine ("");
 						Console.WriteLine ("dxx-plr-editor.exe [/primaryautoselect weaponlist] [/secondaryautoselect weaponlist");
 						Console.WriteLine ("                   [/f9 text] [/f10 text] [/f11 text] [/f12 text] [/overwrite]");
@@ -140,9 +140,10 @@ namespace dxxplreditor
 						Console.WriteLine ("      Sets f9 macro to 'DARKRED WHITE BRIGHTORANGE DARKPURPLE' with each word");
 						Console.WriteLine ("        a different color.");
 						Console.WriteLine ("");
-						Console.WriteLine ("    Macro f9 through f12 color format:  (more colors to come soon)");
-						Console.WriteLine ("      /r = dark red, /R = bright red, /y = yellow, /w = white, /o = orange");
-						Console.WriteLine ("      /p = dark purple, /P = bright purple, /g = dark green");
+						Console.WriteLine ("    Macro f9 through f12 color format:");
+						Console.WriteLine ("      /r = dark red, /R = bright red, /Y = bright yellow, /w = white, /o = orange");
+						Console.WriteLine ("      /O = bright orange, /p = dark purple, /P = bright purple, /g = dark green,");
+						Console.WriteLine ("      /G = bright green");
 						Console.WriteLine ("      *To print a / character use two //... /f9 \"this is a //\"");
 						Console.WriteLine ("");
 						Console.WriteLine ("   NOTES:  By default the new .plr file is written to a new file in the same directory as");
