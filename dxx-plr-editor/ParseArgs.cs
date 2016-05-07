@@ -108,7 +108,7 @@ namespace dxxplreditor
 					} else if (args [count].Equals ("/help")) {
 						if (debug == true) { Console.WriteLine ("OPTION /help"); }
 						Console.WriteLine ("");
-						Console.WriteLine ("dxx-plr-editor.exe v0.2.1 - Command line Descent 1 and 2 .PLR file editor tool");
+						Console.WriteLine ("dxx-plr-editor.exe v0.2.2 - Command line Descent 1 and 2 .PLR file editor tool");
 						Console.WriteLine ("");
 						Console.WriteLine ("dxx-plr-editor.exe [/primaryautoselect weaponlist] [/secondaryautoselect weaponlist");
 						Console.WriteLine ("                   [/f9 text] [/f10 text] [/f11 text] [/f12 text] [/overwrite]");
