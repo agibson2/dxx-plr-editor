@@ -30,7 +30,7 @@ namespace dxxplreditor
 						if (debug) { Console.WriteLine ("OPTION /primaryautoselect"); }
 						count++;
 						if (count < args.Length) {
-							primaryautoselect = args [count++].Split (',');
+							primaryautoselect = args [count].Split (',');
 						} else {
 							Console.WriteLine ("ERROR: /primaryautoselect option requires a parameter with a list of weapons separated by ,");
 							return(-1);
@@ -39,7 +39,7 @@ namespace dxxplreditor
 						if (debug) { Console.WriteLine ("OPTION /secondaryautoselect"); }
 						count++;
 						if (count < args.Length) {
-							secondaryautoselect = args [count++].Split (',');
+							secondaryautoselect = args [count].Split (',');
 						} else {
 							Console.WriteLine ("ERROR: /secondaryautoselect option requires a parameter with a list of weapons separated by ,");
 							return(-1);
