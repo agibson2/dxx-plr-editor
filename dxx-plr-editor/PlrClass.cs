@@ -270,7 +270,7 @@ namespace dxxplreditor
 				return(null);
 			}
 
-			if (debugEnabled == true) { Console.WriteLine ("EncodeColors Descent {0}: {0}", descentversion, toEncode); };
+			if (debugEnabled == true) { Console.WriteLine ("EncodeColors Descent {0}: {1}", descentversion, toEncode); };
 			Encoding f9Binary = Encoding.GetEncoding (28591);
 			byte[] newString = new byte[35];
 			bool escape = false;
