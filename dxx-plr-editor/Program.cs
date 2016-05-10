@@ -10,10 +10,6 @@ namespace dxxplreditor
 			ParseArgs pargs = new ParseArgs();
 			int pargsRetval = pargs.Parse (args);
 			if (pargsRetval == -1) {
-				Console.WriteLine ("ERROR: ParseArgs failed");
-				return(1);
-			} else if (pargsRetval == -2) {
-				// help message requested so just exit
 				return(1);
 			}
 

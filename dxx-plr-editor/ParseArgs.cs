@@ -175,7 +175,7 @@ namespace dxxplreditor
 						Console.WriteLine ("");
 						Console.WriteLine ("           /primaryautoselect and /secondaryautoselect only support d2 .PLR files currently");
 						Console.WriteLine ("");
-						return(-2);  // return failure to make sure the the caller knows that they should not proceed doing things
+						return(-1);  // return failure to make sure the the caller knows that they should not proceed doing things
 					} else {
 						if (args [count] [0] == '/') {
 							Console.WriteLine ("ERROR: '{0}' is not a valid command line option", args [count]);
