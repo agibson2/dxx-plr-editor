@@ -15,6 +15,7 @@ namespace dxxplreditor
 		public string f11;
 		public string f12;
 		public bool overwrite = false;
+		public bool cleanupmissions = false;
 
 		public ParseArgs()
 		{
@@ -27,7 +28,9 @@ namespace dxxplreditor
 
 				while (count < args.Length) {
 					if (args [count].Equals ("/primaryautoselect")) {
-						if (debug) { Console.WriteLine ("OPTION /primaryautoselect"); }
+						if (debug) {
+							Console.WriteLine ("OPTION /primaryautoselect");
+						}
 						count++;
 						if (count < args.Length) {
 							primaryautoselect = args [count].Split (',');
@@ -36,7 +39,9 @@ namespace dxxplreditor
 							return(-1);
 						}
 					} else if (args [count].Equals ("/secondaryautoselect")) {
-						if (debug) { Console.WriteLine ("OPTION /secondaryautoselect"); }
+						if (debug) {
+							Console.WriteLine ("OPTION /secondaryautoselect");
+						}
 						count++;
 						if (count < args.Length) {
 							secondaryautoselect = args [count].Split (',');
@@ -45,7 +50,9 @@ namespace dxxplreditor
 							return(-1);
 						}
 					} else if (args [count].Equals ("/f9")) {
-						if (debug == true) { Console.WriteLine ("OPTION /f9"); }
+						if (debug == true) {
+							Console.WriteLine ("OPTION /f9");
+						}
 						count++;
 						if (count < args.Length) {
 							f9 = args [count];
@@ -58,7 +65,9 @@ namespace dxxplreditor
 							return(-1);
 						}
 					} else if (args [count].Equals ("/f10")) {
-						if (debug == true) { Console.WriteLine ("OPTION /f10"); }
+						if (debug == true) {
+							Console.WriteLine ("OPTION /f10");
+						}
 						count++;
 						if (count < args.Length) {
 							f10 = args [count];
@@ -71,7 +80,9 @@ namespace dxxplreditor
 							return(-1);
 						}
 					} else if (args [count].Equals ("/f11")) {
-						if (debug == true) { Console.WriteLine ("OPTION /f11"); }
+						if (debug == true) {
+							Console.WriteLine ("OPTION /f11");
+						}
 						count++;
 						if (count < args.Length) {
 							f11 = args [count];
@@ -84,7 +95,9 @@ namespace dxxplreditor
 							return(-1);
 						}
 					} else if (args [count].Equals ("/f12")) {
-						if (debug == true) { Console.WriteLine ("OPTION /f12"); }
+						if (debug == true) {
+							Console.WriteLine ("OPTION /f12");
+						}
 						count++;
 						if (count < args.Length) {
 							f12 = args [count];
@@ -97,8 +110,13 @@ namespace dxxplreditor
 							return(-1);
 						}
 					} else if (args [count].Equals ("/overwrite")) {
-						if (debug == true) { Console.WriteLine ("OPTION: /overwrite"); }
+						if (debug == true) {
+							Console.WriteLine ("OPTION: /overwrite");
+						}
 						overwrite = true;
+					} else if (args [count].Equals ("/cleanupmissions")) {
+						if (debug == true) { Console.WriteLine ("OPTION /cleanupmissions"); }
+						cleanupmissions = true;
 					} else if (args [count].Equals ("/debug")) {
 						Console.WriteLine ("OPTION: /debug");
 						debug = true;
@@ -123,13 +141,16 @@ namespace dxxplreditor
 						Console.WriteLine ("         d2 secondary weaponlist: concussion,homing,proximity,smartmissile,mega");
 						Console.WriteLine ("                                  flash,guided,smartmine,mercury,earthshaker");
 						Console.WriteLine ("");
-						Console.WriteLine ("    /f9 <text>     Sets F9 macro text (supports color using color format below)");
-						Console.WriteLine ("    /f10 <text>    Sets F10 macro text (supports color using color format below)");
-						Console.WriteLine ("    /f11 <text>    Sets F11 macro text (supports color using color format below)");
-						Console.WriteLine ("    /f12 <text>    Sets F12 macro text (supports color using color format below)");
+						Console.WriteLine ("    /f9 <text>        Sets F9 macro text (supports color using color format below)");
+						Console.WriteLine ("    /f10 <text>       Sets F10 macro text (supports color using color format below)");
+						Console.WriteLine ("    /f11 <text>       Sets F11 macro text (supports color using color format below)");
+						Console.WriteLine ("    /f12 <text>       Sets F12 macro text (supports color using color format below)");
 						Console.WriteLine ("");
-						Console.WriteLine ("    /debug         Print lots of debug output and force press a key to exit program");
-						Console.WriteLine ("    /overwrite     Overwrite the existing .PLR instead of creating a .new file");
+						Console.WriteLine ("    /cleanupmissions  Removes level status from .plr file for levels with last");
+						Console.WriteLine ("                      maximum level achieved equal to 1 which is not needed.");
+						Console.WriteLine ("");
+						Console.WriteLine ("    /debug            Print lots of debug output and force press a key to exit program");
+						Console.WriteLine ("    /overwrite        Overwrite the existing .PLR instead of creating a .new file");
 						Console.WriteLine ("");
 						Console.WriteLine ("  Examples:");
 						Console.WriteLine ("    dxx-plr-editor.exe /primaryautoselect omega,plasma /secondaryautoselect mercury,smartmissile \"C:\\descent 2\\adam.plr\"");

@@ -81,6 +81,13 @@ namespace dxxplreditor
 				}
 			}
 
+			if (pargs.cleanupmissions) {
+				if (plr.CleanupMissions () == -1) {
+					Console.WriteLine ("ERROR: Problem removing mission status entries with maximum level at 1 or less.");
+					return(1);
+				}
+			}
+
 			if (plr.debugEnabled) {
 				Console.WriteLine ("*********** Debug: Dump of PLR file contents AFTER changes ************");
 				plr.Dump ();

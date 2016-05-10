@@ -26,6 +26,9 @@ namespace dxxplreditor
 {
 	public class PlrClass
 	{
+		const int PLR_MISSION_MAXLEVEL_NAME_LENGTH = 9;
+		const int PLR_MISSION_MAXLEVEL_ENTRY_LENGTH = PLR_MISSION_MAXLEVEL_NAME_LENGTH + 1;  // 9 bytes for mission name and 1 byte for max level
+
 		const int PLR_MAX_JOYSTICK_NAME_BUFFER = 13;
 
 		public bool import_valid;
@@ -254,6 +257,61 @@ namespace dxxplreditor
 		public void SetNum_mission_protocol_entries( Int32 newNum_mission_protocol_entries )
 		{
 			num_mission_protocol_entries = newNum_mission_protocol_entries;
+		}
+
+		public int CleanupMissions()
+		{
+			if (import_valid) {
+				int missionsRemoved = 0;
+				if (mission_arr != null) {
+					// Need a count of missions with max level greater than 1 to set the array to the new size
+					int newMissionCount = 0;
+					foreach (PlrMission tmp2Mission in mission_arr) {
+
+						if (tmp2Mission.maximum_level > 1) {
+							//Console.WriteLine ("'{0}':{1} {2}", tmpMission.mission_name, tmpMission.mission_name.Length, tmpMission.maximum_level);
+							newMissionCount++;
+						}
+					}
+					if (newMissionCount < num_mission_protocol_entries) {						
+						PlrMission[] cleanedUpMissions = new PlrMission[newMissionCount];
+						int msnLoop = 0;
+						foreach (PlrMission tmp3Mission in mission_arr) {
+							if (tmp3Mission.maximum_level > 1) {
+								PlrMission tmpMission = new PlrMission ();
+								tmpMission.maximum_level = tmp3Mission.maximum_level;
+								tmpMission.mission_name = tmp3Mission.mission_name;
+								cleanedUpMissions [msnLoop] = tmpMission;
+								msnLoop++;
+							} else {
+								if (debugEnabled) {
+									Console.WriteLine ("CleanupMissions: Removing mission status entry '{0}' with max level at '{1}'", tmp3Mission.mission_name, tmp3Mission.maximum_level);
+								}
+							}
+						}
+						missionsRemoved = num_mission_protocol_entries - msnLoop;
+						imported_filesize -= PLR_MISSION_MAXLEVEL_ENTRY_LENGTH * missionsRemoved;
+						if(displayInfoMessages) {
+							Console.WriteLine ("Removed {0} mission status entries with maximum level at 1", missionsRemoved); 
+						}
+						
+						num_mission_protocol_entries = msnLoop;
+						mission_arr = cleanedUpMissions;
+					} else {
+						if (debugEnabled) {
+							Console.WriteLine ("CleanupMissions: Missions do not need cleaned up.  No mission status entries have a maximum level equal to 1");
+						}
+					}
+				} else {
+					Console.WriteLine ("ERROR: CleanupMissions mission_arr is null.");
+					return(-1);
+				}
+
+				return(missionsRemoved);
+			} else {
+				Console.WriteLine ("ERROR: CleanupMissions requires an imported PLR file");
+				return(-1);
+			}
 		}
 
 		public bool isDescentVersionValid ()
@@ -616,9 +674,6 @@ namespace dxxplreditor
 					return(-1);
 				}
 			}
-
-			const int PLR_MISSION_MAXLEVEL_NAME_LENGTH = 9;
-			const int PLR_MISSION_MAXLEVEL_ENTRY_LENGTH = PLR_MISSION_MAXLEVEL_NAME_LENGTH + 1;  // 9 bytes for mission name and 1 byte for max level
 
 			int filesize_without_highlevels = filedata.Length - (PLR_MISSION_MAXLEVEL_ENTRY_LENGTH * num_mission_protocol_entries);
 
