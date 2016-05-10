@@ -729,8 +729,6 @@ namespace dxxplreditor
 				fileoffset += 2; //19 here d2... 21 next line
 			}
 
-			mission_arr = new PlrMission[num_mission_protocol_entries];
-
 			//const int MISSION_PROTOCOL_ENTRIES_OFFSET_START = 21;
 			mission_arr = new PlrMission[num_mission_protocol_entries];
 			int loop = 0;
