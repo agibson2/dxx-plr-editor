@@ -130,7 +130,7 @@ namespace dxxplreditor
 						Console.WriteLine ("");
 						Console.WriteLine ("dxx-plr-editor.exe [/primaryautoselect weaponlist] [/secondaryautoselect weaponlist");
 						Console.WriteLine ("                   [/f9 text] [/f10 text] [/f11 text] [/f12 text] [/overwrite]");
-						Console.WriteLine ("                   [/debug] filename.plr");
+						Console.WriteLine ("                   [/debug] [/cleanupmission] filename.plr");
 						Console.WriteLine ("");
 						Console.WriteLine ("  Options:");
 						Console.WriteLine ("    /primaryautoselect weaponlist  Change primary autoselect list (, separated list)");
