@@ -4,7 +4,7 @@ namespace dxxplreditor
 {
 	public class ParseArgs
 	{
-		public string filename = "Z:\\Games\\Descent2\\static.plr";
+		public string filename;
 
 		public bool debug = false;
 		public bool quiet = false;
@@ -187,6 +187,11 @@ namespace dxxplreditor
 				
 					count++;
 				}
+			}
+
+			if (filename == null) {
+				Console.WriteLine ("ERROR: .PLR filename argument required.");
+				return(-1);
 			}
 
 			return(1);
